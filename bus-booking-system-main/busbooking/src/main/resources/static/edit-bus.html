@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Bus</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Edit Bus</h2>
+
+<input type="text" id="busName" placeholder="Bus Name">
+<br><br>
+
+<input type="text" id="source" placeholder="Source">
+<br><br>
+
+<input type="text" id="destination" placeholder="Destination">
+<br><br>
+
+<input type="number" id="seats" placeholder="Seats">
+<br><br>
+
+<button onclick="updateBus()">Update Bus</button>
+
+<script>
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    fetch(`http://localhost:8080/bus/${id}`)
+        .then(response => response.json())
+        .then(bus => {
+
+            document.getElementById("busName").value = bus.busName;
+            document.getElementById("source").value = bus.source;
+            document.getElementById("destination").value = bus.destination;
+            document.getElementById("seats").value = bus.seats;
+        });
+
+    function updateBus()
+    {
+        const bus = {
+
+            busName: document.getElementById("busName").value,
+            source: document.getElementById("source").value,
+            destination: document.getElementById("destination").value,
+            seats: document.getElementById("seats").value
+        };
+
+        fetch(`http://localhost:8080/bus/${id}`, {
+
+            method: "PUT",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(bus)
+
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                alert("Bus Updated Successfully");
+
+                window.location.href = "view-buses.html";
+            });
+    }
+
+</script>
+
+</body>
+</html>
