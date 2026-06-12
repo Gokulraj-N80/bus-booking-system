@@ -2,9 +2,9 @@ HELP.md
 target/
 .idea/
 *.iml
-*.class
-.mvn/
 *.log
+
+busbooking/src/main/resources/application.properties
 
 ### STS ###
 .apt_generated

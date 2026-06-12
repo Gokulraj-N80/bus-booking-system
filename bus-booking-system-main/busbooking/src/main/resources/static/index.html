@@ -1,19 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Bus Ticket System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Ticket Booking</title>
+
     <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
 
-
+<div class="navbar">
+      Bus Ticket Booking System
+</div>
 
 <div class="container">
 
-    <h1>BUS TICKET BOOKING SYSTEM</h1>
 
-    <a href="admin-dashboard.html"><button>Admin Dashboard</button></a>
-    <a href="book-ticket.html"><button>Book Ticket</button></a>
+
+    <div class="login-container">
+
+        <!-- USER CARD -->
+
+        <div class="login-card">
+
+            <h2>👤 User</h2>
+
+            <p>
+                Search buses and book tickets.
+            </p>
+
+            <a href="/oauth2/authorization/google">
+                <button class="btn">
+                    Login as User
+                </button>
+            </a>
+
+        </div>
+
+        <!-- ADMIN CARD -->
+
+        <div class="login-card">
+
+            <h2>👨‍💼 Admin</h2>
+
+            <p>
+                Manage buses, edit routes and Delete Buses.
+            </p>
+
+            <a href="/oauth2/authorization/google">
+                <button class="btn">
+                    Login as Admin
+                </button>
+            </a>
+
+        </div>
+
+    </div>
 
 </div>
 

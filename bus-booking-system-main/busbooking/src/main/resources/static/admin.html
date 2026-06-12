@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<div class="navbar">
+    👨‍💼 Admin Dashboard
+
+    <button class="logout-btn"
+            onclick="logout()">
+        Logout
+    </button>
+</div>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>Add New Bus</h2>
+
+        <input
+                type="text"
+                id="busName"
+                placeholder="Bus Name">
+
+        <input
+                type="text"
+                id="source"
+                placeholder="Source">
+
+        <input
+                type="text"
+                id="destination"
+                placeholder="Destination">
+
+        <input
+                type="number"
+                id="seats"
+                placeholder="Seats">
+
+        <button
+                class="btn"
+                onclick="addBus()">
+
+            Add Bus
+
+        </button>
+
+    </div>
+
+    <div id="message"></div>
+
+    <h2 class="title">
+        Available Buses
+    </h2>
+
+    <div
+            class="bus-container"
+            id="busContainer">
+
+    </div>
+
+</div>
+
+<script>
+
+    const token =
+        new URLSearchParams(
+            window.location.search)
+            .get("token");
+
+    loadBuses();
+
+    function addBus()
+    {
+        fetch("/bus",
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                        "application/json",
+
+                    Authorization:
+                        "Bearer " + token
+                },
+
+                body:JSON.stringify({
+
+                    busName:
+                    document.getElementById(
+                        "busName").value,
+
+                    source:
+                    document.getElementById(
+                        "source").value,
+
+                    destination:
+                    document.getElementById(
+                        "destination").value,
+
+                    seats:
+                    document.getElementById(
+                        "seats").value
+                })
+            })
+
+            .then(res=>res.json())
+
+            .then(data=>{
+
+                document.getElementById(
+                    "message")
+                    .innerHTML=
+                    `
+        <div class="card">
+        <h3 class="success">
+        ✅ Bus Added Successfully
+        </h3>
+        </div>
+        `;
+
+                loadBuses();
+            });
+    }
+
+    function loadBuses()
+    {
+        fetch("/bus",
+            {
+                headers:{
+                    Authorization:
+                        "Bearer " + token
+                }
+            })
+
+            .then(res=>res.json())
+
+            .then(data=>{
+
+                let html="";
+
+                data.forEach(bus=>{
+
+                    html+=`
+
+            <div class="bus-card">
+
+                <h3>
+                ${bus.busName}
+                </h3>
+
+                <p>
+                📍 ${bus.source}
+                →
+                ${bus.destination}
+                </p>
+
+                <p>
+                💺 Seats :
+                ${bus.seats}
+                </p>
+
+                <br>
+
+                <button
+                class="edit-btn"
+                onclick="editBus(
+                ${bus.id},
+                '${bus.busName}',
+                '${bus.source}',
+                '${bus.destination}',
+                ${bus.seats}
+                )">
+
+                Edit
+
+                </button>
+
+                <button
+                class="delete-btn"
+                onclick="deleteBus(${bus.id})">
+
+                Delete
+
+                </button>
+
+            </div>
+
+            `;
+                });
+
+                document.getElementById(
+                    "busContainer")
+                    .innerHTML = html;
+            });
+    }
+
+    function deleteBus(id)
+    {
+        fetch("/bus/"+id,
+            {
+                method:"DELETE",
+
+                headers:{
+                    Authorization:
+                        "Bearer " + token
+                }
+            })
+
+            .then(res=>res.text())
+
+            .then(data=>{
+
+                document.getElementById(
+                    "message")
+                    .innerHTML=
+                    `
+        <div class="card">
+        <h3 class="success">
+        ✅ Bus Deleted
+        </h3>
+        </div>
+        `;
+
+                loadBuses();
+            });
+    }
+
+    function editBus(
+        id,
+        busName,
+        source,
+        destination,
+        seats)
+    {
+        document.getElementById(
+            "message")
+            .innerHTML=
+
+            `
+    <div class="card">
+
+        <h2>Edit Bus</h2>
+
+        <input
+        type="text"
+        id="editBusName"
+        value="${busName}">
+
+        <input
+        type="text"
+        id="editSource"
+        value="${source}">
+
+        <input
+        type="text"
+        id="editDestination"
+        value="${destination}">
+
+        <input
+        type="number"
+        id="editSeats"
+        value="${seats}">
+
+        <button
+        class="btn"
+        onclick="updateBus(${id})">
+
+        Update Bus
+
+        </button>
+
+    </div>
+    `;
+    }
+
+    function updateBus(id)
+    {
+        fetch("/bus/"+id,
+            {
+                method:"PUT",
+
+                headers:{
+                    "Content-Type":
+                        "application/json",
+
+                    Authorization:
+                        "Bearer " + token
+                },
+
+                body:JSON.stringify({
+
+                    busName:
+                    document.getElementById(
+                        "editBusName").value,
+
+                    source:
+                    document.getElementById(
+                        "editSource").value,
+
+                    destination:
+                    document.getElementById(
+                        "editDestination").value,
+
+                    seats:
+                    document.getElementById(
+                        "editSeats").value
+                })
+            })
+
+            .then(res=>res.json())
+
+            .then(data=>{
+
+                document.getElementById(
+                    "message")
+                    .innerHTML=
+                    `
+        <div class="card">
+        <h3 class="success">
+        ✅ Bus Updated Successfully
+        </h3>
+        </div>
+        `;
+
+                loadBuses();
+            });
+    }
+    function logout()
+    {
+        window.location.href="/";
+    }
+
+</script>
+
+</body>
+</html>

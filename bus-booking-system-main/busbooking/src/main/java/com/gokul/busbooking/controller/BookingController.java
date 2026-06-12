@@ -14,8 +14,12 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
-    @PostMapping
+    @PostMapping("/book")
     public Booking bookTicket(@RequestBody Booking booking) {
+
+        System.out.println("BOOKING RECEIVED");
+        System.out.println("NAME = " + booking.getPassengerName());
+
         return bookingService.bookTicket(booking);
     }
 }

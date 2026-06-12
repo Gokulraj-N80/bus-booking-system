@@ -25,30 +25,29 @@ public class BusController {
     public List<Bus> getAllBuses() {
         return busService.getAllBuses();
     }
+
+    @GetMapping("/{id}")
+    public Bus getBusById(@PathVariable Long id) {
+        return busService.getBusById(id);
+    }
+
     @PutMapping("/{id}")
     public Bus updateBus(@PathVariable Long id,
                          @RequestBody Bus bus) {
-
         return busService.updateBus(id, bus);
     }
+
     @DeleteMapping("/{id}")
     public String deleteBus(@PathVariable Long id) {
-
         busService.deleteBus(id);
-
         return "Bus Deleted Successfully";
     }
-    @GetMapping("/{id}")
-    public Bus getBusById(@PathVariable Long id)
-    {
-        return busService.getBusById(id);
-    }
+
     @GetMapping("/search")
     public List<Bus> searchBus(
             @RequestParam String source,
-            @RequestParam String destination)
-    {
+            @RequestParam String destination) {
+
         return busService.searchBus(source, destination);
     }
-
 }

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<div class="navbar">
+    👤 User Dashboard
+
+    <button class="logout-btn"
+            onclick="logout()">
+        Logout
+    </button>
+</div>
+
+<div class="container">
+
+    <h2 class="title">
+        Search Available Buses
+    </h2>
+
+    <div class="search-box">
+
+        <input
+                type="text"
+                id="source"
+                placeholder="Enter Source">
+
+        <input
+                type="text"
+                id="destination"
+                placeholder="Enter Destination">
+
+        <button
+                class="btn"
+                onclick="searchBus()">
+
+            Search Bus
+
+        </button>
+
+        <button
+                class="btn"
+                onclick="loadAllBuses()"
+                style="margin-top:10px;">
+
+            Show All Buses
+
+        </button>
+
+    </div>
+
+    <div id="message"></div>
+
+    <h2 class="title">
+        Available Buses
+    </h2>
+
+    <div
+            class="bus-container"
+            id="busContainer">
+
+    </div>
+
+</div>
+
+<script>
+
+    const token =
+        new URLSearchParams(window.location.search)
+            .get("token");
+
+    /* Dashboard open aana udane buses load */
+    loadAllBuses();
+
+    /* Load All Buses */
+
+    function loadAllBuses()
+    {
+        fetch("/bus",
+            {
+                headers:{
+                    Authorization:
+                        "Bearer " + token
+                }
+            })
+
+            .then(res => {
+                console.log("STATUS =", res.status);
+                return res.json();
+            })
+            .then(data => {
+
+                let html = "";
+
+                if(data.length === 0)
+                {
+                    html =
+                        "<h3 style='color:red'>No Buses Available</h3>";
+                }
+
+                data.forEach(bus => {
+
+                    html += `
+
+            <div class="bus-card">
+
+                <h3>${bus.busName}</h3>
+
+                <p>
+                📍 ${bus.source}
+                →
+                ${bus.destination}
+                </p>
+
+                <p>
+                💺 Available Seats :
+                ${bus.seats}
+                </p>
+
+                <br>
+
+                <button
+                class="btn"
+                onclick="showBookingForm(${bus.id})">
+
+                Book Now
+
+                </button>
+
+            </div>
+
+            `;
+                });
+
+                document.getElementById(
+                    "busContainer")
+                    .innerHTML = html;
+            })
+    .then(res => res.text())
+        .then(data => {
+            console.log(data);
+
+            document.getElementById("message")
+                .innerHTML =
+                `
+    <div class="card">
+        <h2 class="success">
+        ✅ Ticket Booked Successfully
+        </h2>
+    </div>
+    `;
+        });
+    }
+
+    /* Search Bus */
+
+    function searchBus()
+    {
+        let source =
+            document.getElementById("source").value;
+
+        let destination =
+            document.getElementById("destination").value;
+
+        fetch(
+            `/bus/search?source=${source}&destination=${destination}`,
+            {
+                headers:{
+                    Authorization:
+                        "Bearer " + token
+                }
+            }
+        )
+
+            .then(res => res.json())
+
+            .then(data => {
+
+                let html = "";
+
+                if(data.length === 0)
+                {
+                    html =
+                        "<h3 style='color:red'>No Buses Found</h3>";
+                }
+
+                data.forEach(bus => {
+
+                    html += `
+
+            <div class="bus-card">
+
+                <h3>
+                ${bus.busName}
+                </h3>
+
+                <p>
+                📍 ${bus.source}
+                →
+                ${bus.destination}
+                </p>
+
+                <p>
+                💺 Available Seats :
+                ${bus.seats}
+                </p>
+
+                <br>
+
+                <button
+                class="btn"
+                onclick="showBookingForm(${bus.id})">
+
+                Book Now
+
+                </button>
+
+            </div>
+
+            `;
+                });
+
+                document.getElementById(
+                    "busContainer")
+                    .innerHTML = html;
+            });
+    }
+
+    /* Booking Form */
+
+    function showBookingForm(busId)
+    {
+        document.getElementById("message")
+            .innerHTML = `
+
+    <div class="card">
+
+        <h3>Book Ticket</h3>
+
+        <input
+        type="text"
+        id="passengerName"
+        placeholder="Passenger Name">
+
+        <input
+        type="text"
+        id="mobileNumber"
+        placeholder="Mobile Number">
+
+        <input
+        type="number"
+        id="seatsBooked"
+        placeholder="Seats Required">
+
+        <button
+        class="btn"
+        onclick="bookBus(${busId})">
+
+        Confirm Booking
+
+        </button>
+
+    </div>
+
+    `;
+    }
+
+    /* Book Bus */
+
+    function bookBus(busId)
+    {
+        const passengerName =
+            document.getElementById("passengerName").value;
+
+        const mobileNumber =
+            document.getElementById("mobileNumber").value;
+
+        const seatsBooked =
+            document.getElementById("seatsBooked").value;
+
+        fetch("/booking/book",
+            {
+                method: "POST",
+
+                headers:
+                    {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    },
+
+                body: JSON.stringify(
+                    {
+                        passengerName: passengerName,
+                        mobileNumber: mobileNumber,
+                        busId: busId,
+                        seatsBooked: parseInt(seatsBooked)
+                    })
+            })
+
+            .then(response =>
+            {
+                console.log("STATUS =", response.status);
+
+                if (!response.ok)
+                {
+                    throw new Error(
+                        "Booking Failed : " + response.status
+                    );
+                }
+
+                return response.json();
+            })
+
+            .then(data =>
+            {
+                console.log("BOOKED =", data);
+
+                document.getElementById("message").innerHTML = `
+            <div class="card">
+                <h2 class="success">
+                    ✅ Bus Booked Successfully
+                </h2>
+            </div>
+        `;
+
+                loadAllBuses();
+            })
+
+            .catch(error =>
+            {
+                console.error(error);
+
+                document.getElementById("message").innerHTML = `
+            <div class="card">
+                <h2 style="color:red">
+                    ❌ Booking Failed
+                </h2>
+                <p>${error.message}</p>
+            </div>
+        `;
+            });
+    }
+    function logout()
+    {
+        window.location.href="/";
+    }
+
+</script>
+
+</body>
+</html>
